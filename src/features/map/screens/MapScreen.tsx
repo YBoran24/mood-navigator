@@ -8,6 +8,8 @@ import {
     Image,
     Keyboard,
     KeyboardAvoidingView,
+    Linking // Eklendi
+    ,
     Modal,
     Platform,
     ScrollView,
@@ -65,20 +67,35 @@ export const MapScreen = () => {
     // Başlangıçta konumu al
     useEffect(() => {
         (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                return;
-            }
-            let location = await Location.getCurrentPositionAsync({});
-            setUserLocation(location);
+            try {
+                let { status } = await Location.requestForegroundPermissionsAsync();
 
-            if (mapRef.current) {
-                mapRef.current.animateToRegion({
-                    latitude: location.coords.latitude,
-                    longitude: location.coords.longitude,
-                    latitudeDelta: 0.02,
-                    longitudeDelta: 0.02,
-                }, 1000);
+                if (status !== 'granted') {
+                    Alert.alert(
+                        "Konum İzni Gerekli",
+                        "Size en yakın mekanları bulabilmemiz için konum iznini açmanız gerekiyor.",
+                        [
+                            { text: "Vazgeç", style: "cancel" },
+                            { text: "Ayarlara Git", onPress: () => Linking.openSettings() }
+                        ]
+                    );
+                    return;
+                }
+
+                let location = await Location.getCurrentPositionAsync({});
+                setUserLocation(location);
+
+                if (mapRef.current) {
+                    mapRef.current.animateToRegion({
+                        latitude: location.coords.latitude,
+                        longitude: location.coords.longitude,
+                        latitudeDelta: 0.02,
+                        longitudeDelta: 0.02,
+                    }, 1000);
+                }
+            } catch (error) {
+                console.error("Konum hatası:", error);
+                Alert.alert("Hata", "Konumunuz alınamadı. Lütfen GPS servisinizi kontrol edin.");
             }
         })();
     }, []);

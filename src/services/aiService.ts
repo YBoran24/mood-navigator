@@ -1,9 +1,12 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Senin Yeni Anahtarın (Boşluksuz, tertemiz)
-export const API_KEY = "AIzaSyDi2R1AxOXFPWgaxdMLUi2w29d3QcCoyMM";
+const API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
-const genAI = new GoogleGenerativeAI(API_KEY);
+if (!API_KEY) {
+    console.error("Gemini API Key bulunamadı! .env dosyasını kontrol et.");
+}
+
+const genAI = new GoogleGenerativeAI(API_KEY || "");
 
 export const analyzePlaceMood = async (
     placeName: string,
